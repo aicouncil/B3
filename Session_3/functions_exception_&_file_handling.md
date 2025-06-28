@@ -259,5 +259,105 @@ student_details(name="Ajay", course="Python", Duration="4 Weeks")
 - **Variable Arguments**: Use `*args` for positional and `**kwargs` for keyword argument lists.
 
 ---
+# Exception Handling & File Handling in Python
+
+## Exception Handling
+
+Exception handling in Python is used to manage errors that occur during program execution. It helps prevent the abrupt termination of a program and allows you to handle errors gracefully.
+
+### Basic Syntax
+
+```python
+try:
+    # Code that may raise an exception
+    x = 1 / 0
+except ZeroDivisionError:
+    print("Cannot divide by zero!")
+finally:
+    print("This block always executes.")
+```
+
+### Common Exception Types
+
+- `ZeroDivisionError`: Raised when division by zero occurs.
+- `ValueError`: Raised when a function receives an argument of the correct type but inappropriate value.
+- `FileNotFoundError`: Raised when a file or directory is requested but does not exist.
+- `TypeError`: Raised when an operation or function is applied to an object of inappropriate type.
+
+### Multiple Except Blocks
+
+You can handle different exceptions with multiple except blocks:
+
+```python
+try:
+    num = int(input("Enter a number: "))
+    result = 10 / num
+except ValueError:
+    print("Please enter a valid integer.")
+except ZeroDivisionError:
+    print("Cannot divide by zero!")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
+else:
+    print(f"Result: {result}")
+finally:
+    print("Execution complete.")
+```
+
+## File Handling
+
+File handling allows you to create, read, write, and close files in Python.
+
+### Opening and Closing Files
+
+Use the `open()` function to open a file. Always close the file after completing operations.
+
+```python
+file = open("example.txt", "w")
+file.write("Hello, World!")
+file.close()
+```
+
+### Using `with` Statement
+
+The `with` statement handles opening and closing files automatically.
+
+```python
+with open("example.txt", "r") as file:
+    content = file.read()
+    print(content)
+```
+
+### Common File Modes
+
+- `'r'`: Read (default mode). File must exist.
+- `'w'`: Write. Creates a new file or overwrites existing file.
+- `'a'`: Append. Adds content to the end of the file.
+- `'b'`: Binary mode.
+- `'t'`: Text mode (default).
+
+You can combine modes, e.g., `'rb'` for reading binary files.
+
+### Handling Exceptions in File Operations
+
+It's good practice to include exception handling in file operations to manage errors like missing files or permission issues.
+
+```python
+try:
+    with open("data.txt", "r") as file:
+        data = file.read()
+        print(data)
+except FileNotFoundError:
+    print("File not found. Please check the file name.")
+except IOError:
+    print("An I/O error occurred.")
+```
+
+---
+
+**Best Practices:**
+- Always use the `with` statement for file operations.
+- Handle exceptions to prevent program crashes.
+- Use specific exception types for clarity.
 
 **Practice these examples and modify them to deepen your understanding!**
