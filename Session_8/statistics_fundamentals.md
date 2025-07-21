@@ -150,15 +150,10 @@ Standard Deviation (SD) is a measure of the amount of variation or dispersion in
 For a dataset \( x_1, x_2, ..., x_n \):
 
 1. **Mean**:  
-   \[
-   \mu = \frac{1}{n} \sum_{i=1}^{n} x_i
-   \]
+   μ = (1/n) * ∑(i=1 to n) x_i
 
 2. **Standard Deviation**:  
-   \[
-   \sigma = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (x_i - \mu)^2}
-   \]
-
+  σ = sqrt((1/n) * ∑(i=1 to n) (x_i - μ)^2)
 ---
 
 ## 🚨 Detecting Outliers Using Standard Deviation
@@ -170,11 +165,8 @@ We consider a data point an outlier if it lies more than **k standard deviations
   - \( k = 3 \): extreme outliers
 
 ### Rule:
-
-\[
-\text{Outlier if: } x < \mu - k\sigma \quad \text{or} \quad x > \mu + k\sigma
-\]
-
+A point x is an outlier if:
+x < μ - kσ or x > μ + kσ
 ---
 
 ## ✅ Example: Outlier Detection in Python
@@ -208,6 +200,68 @@ print(f"Lower Bound: {lower_bound}")
 print(f"Upper Bound: {upper_bound}")
 print(f"Outliers: {outliers}")
 
+# Outlier Detection Using Quantiles
+
+Outliers are data points that significantly differ from other observations in a dataset. Quantile-based methods are effective in detecting outliers in skewed data where standard deviation might not work well.
+
+## What Are Quantiles?
+
+Quantiles are cut points dividing the range of a probability distribution or dataset into contiguous intervals with equal probabilities. For outlier detection, the most commonly used quantiles are:
+
+- **25th percentile (Q1)**: Lower quartile
+- **75th percentile (Q3)**: Upper quartile
+- **Interquartile Range (IQR)**: `IQR = Q3 - Q1`
+
+## Outlier Detection Rule Using IQR
+
+A common method is to flag any data point as an outlier if it falls outside the range:
+
+** Lower Bound = Q1 - 1.5 * IQR 
+** Upper Bound = Q3 + 1.5 * IQR
+
+Any data point `x` is considered an outlier if:
+
+- `x < Lower Bound`
+- `x > Upper Bound`
+
+This method is **non-parametric**, meaning it does not assume any distribution (like normal distribution).
+
+## Example in Python Using Pandas
+
+```python
+import pandas as pd
+
+# Sample data
+data = {'values': [10, 12, 12, 13, 13, 13, 14, 15, 16, 18, 100]}
+df = pd.DataFrame(data)
+
+# Calculate Q1, Q3, and IQR
+Q1 = df['values'].quantile(0.25)
+Q3 = df['values'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Compute bounds
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+print("Lower Bound:", lower_bound)
+print("Upper Bound:", upper_bound)
+
+# Identify outliers
+outliers = df[(df['values'] < lower_bound) | (df['values'] > upper_bound)]
+print("Outliers:\n", outliers)
+
+# Replacing Outliers with Bounds using pandas.clip()
+
+## Instead of removing outliers, you can clip them to the threshold values using clip().
+
+```
+# Clip outliers to lower and upper bounds
+df_clipped = df.copy()
+df_clipped['age'] = df_clipped['age'].clip(lower=lower_bound, upper=upper_bound)
+print("Data after clipping:")
+print(df_clipped)
+```
 
 # Key Takeaways
 
