@@ -256,9 +256,11 @@ print("Outliers:\n", outliers)
 ## Instead of removing outliers, you can clip them to the threshold values using clip().
 
 # Clip outliers to lower and upper bounds
-```
+
+```python
 df_clipped = df.copy()
 df_clipped['age'] = df_clipped['age'].clip(lower=lower_bound, upper=upper_bound)
+
 print("Data after clipping:")
 print(df_clipped)
 ```
