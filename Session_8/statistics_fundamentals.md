@@ -128,6 +128,87 @@ df[cat_cols] = df[cat_cols].astype('category')
 pd.get_dummies(df, columns=cat_cols)
 ```
 
+# Outlier Detection using Standard Deviation
+
+Outliers are data points that deviate significantly from the majority of the data. Detecting and handling outliers is an important preprocessing step in many machine learning and statistical analysis tasks.
+
+One common method to detect outliers is using the **Standard Deviation** method.
+
+---
+
+## 📌 What is Standard Deviation?
+
+Standard Deviation (SD) is a measure of the amount of variation or dispersion in a dataset.
+
+- A **low SD** indicates data points are close to the mean.
+- A **high SD** indicates data points are spread out over a wider range.
+
+---
+
+## 🧮 Formula for Standard Deviation
+
+For a dataset \( x_1, x_2, ..., x_n \):
+
+1. **Mean**:  
+   \[
+   \mu = \frac{1}{n} \sum_{i=1}^{n} x_i
+   \]
+
+2. **Standard Deviation**:  
+   \[
+   \sigma = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (x_i - \mu)^2}
+   \]
+
+---
+
+## 🚨 Detecting Outliers Using Standard Deviation
+
+We consider a data point an outlier if it lies more than **k standard deviations** away from the mean.
+
+- Common thresholds:
+  - \( k = 2 \): mild outliers
+  - \( k = 3 \): extreme outliers
+
+### Rule:
+
+\[
+\text{Outlier if: } x < \mu - k\sigma \quad \text{or} \quad x > \mu + k\sigma
+\]
+
+---
+
+## ✅ Example: Outlier Detection in Python
+
+```python
+import numpy as np
+
+# Sample dataset
+data = [10, 12, 12, 13, 12, 11, 14, 13, 100]
+
+# Convert to numpy array
+data = np.array(data)
+
+# Calculate mean and standard deviation
+mean = np.mean(data)
+std = np.std(data)
+
+# Set threshold (k)
+k = 2
+
+# Define outlier boundaries
+lower_bound = mean - k * std
+upper_bound = mean + k * std
+
+# Detect outliers
+outliers = data[(data < lower_bound) | (data > upper_bound)]
+
+print(f"Mean: {mean}")
+print(f"Standard Deviation: {std}")
+print(f"Lower Bound: {lower_bound}")
+print(f"Upper Bound: {upper_bound}")
+print(f"Outliers: {outliers}")
+
+
 # Key Takeaways
 
     ## Statistical Foundations are crucial for data interpretation
