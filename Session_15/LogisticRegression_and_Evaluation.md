@@ -125,3 +125,83 @@ The file demonstrates three techniques to address this bias:
     ```python
     print(model_log_D.coef_)
     ```
+
+### 1\. Logistic Regression on Imbalanced Data
+
+This section of the notebook demonstrates how to build and evaluate a **Logistic Regression** model. The first model (`model_log_A`) is trained on the original, imbalanced dataset to establish a baseline performance.
+
+  * **Data Preparation:** The script re-initializes the features `X` and target `y` from the preprocessed DataFrame `df2` and scales the features using `MinMaxScaler`.
+    ```python
+    X = df2.drop(columns = ['Exited'])
+    y = df2['Exited']
+
+    scaler = MinMaxScaler()
+    scaler.fit(X)
+    Xscaled = scaler.transform(X)
+
+    xtrain, xtest, ytrain, ytest = train_test_split(Xscaled,y,stratify=y)
+    ```
+  * **Model Training and Evaluation:** A `LogisticRegression` model is imported and trained on the scaled training data. Its accuracy is then evaluated on both the training and test sets.
+    ```python
+    from sklearn.linear_model import LogisticRegression
+    model_log_A = LogisticRegression()
+    model_log_A.fit(xtrain,ytrain)
+    print("Model accuracy on training data -",model_log_A.score(xtrain,ytrain))
+    print("Model accuracy on test data -",model_log_A.score(xtest,ytest))
+    ```
+  * **Performance Analysis:** The `classification_report` is used to reveal the model's performance on a per-class basis. The results would likely show high precision for the majority class (non-churned customers) but low recall for the minority class (churned customers), demonstrating the model's bias towards the more frequent outcome.
+
+-----
+
+### 2\. Logistic Regression with Oversampling (SMOTE)
+
+To address the bias, the script demonstrates retraining the Logistic Regression model using oversampled data created with the SMOTE algorithm.
+
+  * **SMOTE Implementation:** The `imblearn` library's `SMOTE` (Synthetic Minority Over-sampling Technique) is used to generate synthetic data points for the minority class, resulting in a balanced dataset (`Xo`, `yo`).
+    ```python
+    from imblearn.over_sampling import SMOTE
+    ros = SMOTE()
+    Xo,yo = ros.fit_resample(X,y)
+    ```
+  * **Model Training and Evaluation:** A new `LogisticRegression` model (`model_log_B`) is trained on the balanced data. The `classification_report` for this model is expected to show more balanced precision, recall, and f1-score for both classes, indicating a less biased and more robust model.
+    ```python
+    scaler = MinMaxScaler()
+    scaler.fit(Xo)
+    Xscaled = scaler.transform(Xo)
+    xtrain, xtest, ytrain, ytest = train_test_split(Xscaled,yo,stratify=yo)
+
+    model_log_B = LogisticRegression()
+    model_log_B.fit(xtrain,ytrain)
+
+    print(classification_report(ytest, model_log_B.predict(xtest)))
+    ```
+
+-----
+
+### 3\. Logistic Regression with Class Weight Management
+
+**Definition:** Logistic Regression is a statistical model for **binary classification**. It establishes a linear relationship between features and the log-odds of the target and uses the **sigmoid activation function** to predict a probability between 0 and 1.
+
+  * **Mechanism (Sigmoid Function):** The sigmoid function, $f(z) = \\frac{1}{1 + e^{-z}}$, is key to logistic regression. It maps any real number input `z` (the linear combination of features) to a value in the range [0, 1], which can be interpreted as a probability.
+      * **Example 1**: With small weights and input, the output is a probability close to 0.5.
+        ```python
+        x = 1; w0 = 1e-2; w1 = 1e-2
+        z = 1/(1 + np.exp(-(w0 + w1*x)))
+        print(z) # Output: ~0.505
+        ```
+      * **Example 2**: With larger weights and input, the output probability becomes higher.
+        ```python
+        x = 2; w0 = 4 * 1e-2; w1 = 4 * 1e-2
+        z = 1/(1 + np.exp(-(w0 + w1*x)))
+        print(z) # Output: ~0.519
+        ```
+  * **Class Weight Management:** This is a model-level technique to handle imbalanced data by assigning a higher penalty to misclassifying the minority class. The `LogisticRegression` model's `class_weight` parameter is used for this purpose. The script sets `class_weight={0:1 , 1:6}`, which tells the model to penalize errors on class `1` (the minority class) six times more than errors on class `0` (the majority class).
+    ```python
+    model_log_D = LogisticRegression(class_weight={0:1 , 1:6})
+    model_log_D.fit(xtrain,ytrain)
+    ```
+  * **Evaluation and Interpretation:** The `classification_report` for `model_log_D` shows that this technique successfully improves **recall for the minority class** (exited customers), demonstrating the model is now better at identifying actual churn cases. The `model_log_D.coef_` attribute provides the learned weights for each feature, which can be analyzed to understand their impact on the prediction.
+    ```python
+    print(classification_report(ytest, model_log_D.predict(xtest)))
+    print(model_log_D.coef_)
+    ```
